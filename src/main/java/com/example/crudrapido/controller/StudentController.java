@@ -16,9 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.crudrapido.dto.StudentDTO;
 import com.example.crudrapido.entity.Student;
+import com.example.crudrapido.repository.StudentRepository;
 import com.example.crudrapido.service.StudentService;
 
 import jakarta.annotation.Generated;
+import jakarta.validation.constraints.Min;
 
 @RestController
 @RequestMapping(path = "/api/v1/students")
@@ -43,7 +45,10 @@ public class StudentController {
     }
 
     @DeleteMapping("/{studentId}")
-    public void delete(@PathVariable("studentId") Long studentId) {
+    public void delete(@PathVariable("studentId") @Min(value = 1, message = "El ID debe ser mayor a 0") Long studentId) {
+        if (!studentService.getStudent(studentId).isPresent()) {
+            throw new RuntimeException("No se encontró el estudiante con ID: " + studentId);
+        }
         studentService.delete(studentId);
     }  
 

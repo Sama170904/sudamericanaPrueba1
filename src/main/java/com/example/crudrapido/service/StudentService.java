@@ -28,8 +28,8 @@ public class StudentService {
 
     public void create(StudentDTO student) {
         Student estudianteNuevo = Student.builder()
-            .firstName(student.getFirstName())
-            .lastName(student.getLastName())
+            .firstName(student.getFirstName().toUpperCase())
+            .lastName(student.getLastName().toUpperCase())
             .email(student.getEmail())
             .build();
         studentRepository.save(estudianteNuevo);
@@ -40,10 +40,10 @@ public class StudentService {
         .orElseThrow(() -> new RuntimeException("Estudiante no encontrado"));
 
         if (student.getFirstName() != null) {
-            estudianteExistente.setFirstName(student.getFirstName());
+            estudianteExistente.setFirstName(student.getFirstName().toUpperCase());
         }
         if (student.getLastName() != null) {
-            estudianteExistente.setLastName(student.getLastName());
+            estudianteExistente.setLastName(student.getLastName().toUpperCase());
         }
         if (student.getEmail() != null) {
             estudianteExistente.setEmail(student.getEmail());
