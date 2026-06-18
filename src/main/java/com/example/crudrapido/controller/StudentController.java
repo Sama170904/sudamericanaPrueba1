@@ -46,9 +46,6 @@ public class StudentController {
 
     @DeleteMapping("/{studentId}")
     public void delete(@PathVariable("studentId") @Min(value = 1, message = "El ID debe ser mayor a 0") Long studentId) {
-        if (!studentService.getStudent(studentId).isPresent()) {
-            throw new RuntimeException("No se encontró el estudiante con ID: " + studentId);
-        }
         studentService.delete(studentId);
     }  
 

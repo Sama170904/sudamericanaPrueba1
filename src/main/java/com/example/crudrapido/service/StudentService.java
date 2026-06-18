@@ -54,6 +54,9 @@ public class StudentService {
     }
 
     public void delete(Long id) {
+        if (!studentRepository.existsById(id)) {
+            throw new RuntimeException("No se encontró el estudiante con ID: " + id);
+        }
         studentRepository.deleteById(id);
     }
 
