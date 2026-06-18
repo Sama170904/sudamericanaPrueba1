@@ -12,7 +12,7 @@ import com.example.crudrapido.repository.StudentRepository;
 
 import lombok.Builder;
 
-@Builder
+
 @Service
 public class StudentService {
     @Autowired

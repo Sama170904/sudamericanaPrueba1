@@ -22,6 +22,7 @@ import com.example.crudrapido.service.StudentService;
 import jakarta.annotation.Generated;
 import jakarta.validation.constraints.Min;
 
+@Validated
 @RestController
 @RequestMapping(path = "/api/v1/students")
 public class StudentController {
@@ -49,12 +50,8 @@ public class StudentController {
         studentService.delete(studentId);
     }  
 
+
     @GetMapping("/{studentId}")
     public Optional<Student> getById(@PathVariable("studentId") Long studentId) {
-        return studentService.getStudent(studentId);
-    }
-
-
-
-
+        return studentService.getStudent(studentId); }
 }

@@ -20,7 +20,9 @@ public class GlobalResponseHandler implements ResponseBodyAdvice<Object> {
     @Override
     public boolean supports(MethodParameter returnType, Class converterType) {
         return !returnType.getParameterType().equals(ApiResponse.class) && 
-        !returnType.getParameterType().equals(ResponseEntity.class);
+        !returnType.getParameterType().equals(ResponseEntity.class)&&
+            !returnType.getParameterType().equals(String.class) &&
+            !returnType.getParameterType().equals(byte[].class);
     }
     //no hay logica de que se tiene que continuar si es que retorna true or false, porque 
     //como es una interfaz la logica ya está implementada en la clase que lo implementa, 

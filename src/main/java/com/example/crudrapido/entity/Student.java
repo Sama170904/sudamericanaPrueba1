@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor  //no me corria swagger por eso las agregue
 @Entity
 @SQLDelete(sql = "UPDATE tbl_student SET estado = 'INACTIVO' WHERE studentId = ?") //cuando se elimina se hace un update 
-@SQLRestriction("estado = 'ACTIVO'") //cunado se haga un select solo se traen los de estado activo
+@SQLRestriction("estado = 'ACTIVO' || estado = 'INACTIVO'")  //cunado se haga un select solo se traen los de estado activo
 @Table(name = "tbl_student")
 public class Student {
     @Id
