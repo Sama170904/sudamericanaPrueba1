@@ -14,8 +14,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor //no me corria swagger por eso las agregue
 @NoArgsConstructor  //no me corria swagger por eso las agregue
 @Entity
-@SQLDelete(sql = "UPDATE tbl_student SET estado = 'INACTIVO' WHERE studentId = ?") //cuando se elimina se hace un update 
-@SQLRestriction("estado = 'ACTIVO' || estado = 'INACTIVO'")  //cunado se haga un select solo se traen los de estado activo
+@SQLDelete(sql = "UPDATE tbl_student SET estado = 'INACTIVO' WHERE student_id = ?") //cuando se elimina se hace un update 
+@SQLRestriction("estado = 'ACTIVO' || estado = 'INACIVO'")  //cunado se haga un select solo se traen los de estado activo
 @Table(name = "tbl_student")
 public class Student {
     @Id
@@ -35,7 +35,8 @@ public class Student {
     //Enumerated es para decirle a java que vamos a usar un enum, y el EnumType.STRING 
     //para que lo guarde como texto en la base de datos, si no se pone eso lo guarda como un numero y no es tan legible
     @Enumerated(EnumType.STRING) 
-    @Column
+    @Column(nullable = false, columnDefinition = "VARCHAR(20) DEFAULT 'ACTIVO'")
+    @Builder.Default
     private Estado estado = Estado.ACTIVO;
 
     public enum Estado {

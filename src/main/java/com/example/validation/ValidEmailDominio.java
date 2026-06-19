@@ -7,7 +7,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = EmailDominioValidator.class)
 public @interface ValidEmailDominio {
-    String message() default "El correo debe pertenecer al dominio @sasf.com";
+    String message() default "El correo debe pertenecer al dominio "+EmailDominioValidator.DOMINIO;
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

@@ -36,22 +36,22 @@ public class StudentController {
     }
 
     @PostMapping
-    public void create(@RequestBody @Validated(StudentDTO.OnCreate.class) StudentDTO student) {
-        studentService.create(student);
+    public Student create(@RequestBody @Validated(StudentDTO.OnCreate.class) StudentDTO student) {
+        return studentService.create(student);
     }
 
     @PutMapping
-    public void update(@RequestBody @Validated(StudentDTO.OnUpdate.class) StudentDTO student) {
-        studentService.update(student);
+    public Student update(@RequestBody @Validated(StudentDTO.OnUpdate.class) StudentDTO student) {
+        return studentService.update(student);
     }
 
     @DeleteMapping("/{studentId}")
     public void delete(@PathVariable("studentId") @Min(value = 1, message = "El ID debe ser mayor a 0") Long studentId) {
-        studentService.delete(studentId);
+        studentService.delete(studentId); 
     }  
 
 
     @GetMapping("/{studentId}")
-    public Optional<Student> getById(@PathVariable("studentId") Long studentId) {
+    public Student getById(@PathVariable("studentId") Long studentId) {
         return studentService.getStudent(studentId); }
 }
