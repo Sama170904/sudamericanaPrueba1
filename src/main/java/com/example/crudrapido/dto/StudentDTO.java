@@ -25,16 +25,19 @@ public class StudentDTO {
     @Null(groups = OnCreate.class)
     private Long studentId;
 
-    @Size(min = 2, max = 15, message = "El nombre debe tener entre 2 y 15 caracteres", groups = {OnCreate.class, OnUpdate.class})
-    @Pattern(regexp = "^[a-zA-ZáéíóúÁÉÍÓÚñÑ]+$", message = "El nombre no debe contener espacios ni números", groups = {OnCreate.class, OnUpdate.class})
+    @Size(min = 2, max = 15, message = "El nombre debe tener entre 2 y 15 caracteres", groups = {OnCreate.class})
+    @Pattern(regexp = "^[a-zA-ZáéíóúÁÉÍÓÚñÑ]+$", message = "El apellido no debe contener espacios ni números", groups = {OnCreate.class})
+    @Pattern(regexp = "^([a-zA-ZáéíóúÁÉÍÓÚñÑ]+)?$", message = "El apellido no debe contener espacios ni números", groups = {OnUpdate.class})
     @NotBlank(groups = {OnCreate.class})
     private String firstName;
 
-    @Size(min = 2, max = 15, message = "El apellido debe tener entre 2 y 15 caracteres", groups = {OnCreate.class, OnUpdate.class})
-    @Pattern(regexp = "^[a-zA-ZáéíóúÁÉÍÓÚñÑ]+$", message = "El apellido no debe contener espacios ni números", groups = {OnCreate.class, OnUpdate.class})
+    @Size(min = 2, max = 15, message = "El apellido debe tener entre 2 y 15 caracteres", groups = {OnCreate.class})
+    @Pattern(regexp = "^[a-zA-ZáéíóúÁÉÍÓÚñÑ]+$", message = "El apellido no debe contener espacios ni números", groups = {OnCreate.class})
+    @Pattern(regexp = "^([a-zA-ZáéíóúÁÉÍÓÚñÑ]+)?$", message = "El apellido no debe contener espacios ni números", groups = {OnUpdate.class})
     @NotBlank(groups = {OnCreate.class})
     private String lastName;
     
+    @Size(min = 5, max = 30, message = "El correo debe tener entre 5 y 50 caracteres", groups = {OnCreate.class})
     @NotBlank(groups = {OnCreate.class})
     @Email(groups = {OnCreate.class, OnUpdate.class})
     @ValidEmailDominio(groups = {OnCreate.class, OnUpdate.class})

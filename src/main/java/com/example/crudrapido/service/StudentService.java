@@ -41,13 +41,13 @@ public class StudentService {
         Student estudianteExistente = studentRepository.findById(student.getStudentId())
         .orElseThrow(() -> new RuntimeException("Estudiante no encontrado"));
 
-        if (student.getFirstName() != null) {
+        if (student.getFirstName() != null && !student.getFirstName().isEmpty()) {
             estudianteExistente.setFirstName(student.getFirstName().toUpperCase());
         }
-        if (student.getLastName() != null) {
+        if (student.getLastName() != null && !student.getLastName().isEmpty()) {
             estudianteExistente.setLastName(student.getLastName().toUpperCase());
         }
-        if (student.getEmail() != null) {
+        if (student.getEmail() != null && !student.getEmail().isEmpty()) {
             estudianteExistente.setEmail(student.getEmail());
         }
         studentRepository.save(estudianteExistente);

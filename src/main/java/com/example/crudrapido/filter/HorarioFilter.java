@@ -30,7 +30,7 @@ public class HorarioFilter implements Filter {
         LocalTime horaLimite = parametroService.getHoraLimite();
 
         
-        if (horaActual.isAfter(horaLimite)) {
+        if (horaActual.isAfter(horaLimite)&& !httpRequest.getRequestURI().startsWith("/api/parametros")) {
             
             httpResponse.setStatus(HttpStatus.FORBIDDEN.value());
             httpResponse.getWriter().write("Acceso denegado: Fuera de horario. El límite es las " + horaLimite);

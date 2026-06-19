@@ -19,7 +19,7 @@ public class EmailDominioValidator implements ConstraintValidator<ValidEmailDomi
 
 //hacer variable global el "sasf.net"    ya esta
 //solucoanr el return del null          ya esta
-//validar el filtro  
+//probar el filtro                     ya esta
 //agregar entidad cursos con endpoint que agregue un estudoiante a un curso y un endpoint que liste los cursos
 // con la lista de estudianteque tenga ese curso. 
 //en el endpoint de listar estudaintes agregar un filtro que sea opcional, y que sea el nombre del curso

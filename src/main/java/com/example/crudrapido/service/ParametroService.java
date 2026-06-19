@@ -11,21 +11,21 @@ import java.time.LocalTime;
 
 @Service
 public class ParametroService {
-    
-    @Autowired
-    private ParametroRepository repository;
 
-    public LocalTime getHoraLimite() {
+        @Autowired
+        private ParametroRepository repository;
+
+        public LocalTime getHoraLimite() {
         return repository.findById("hora_limite")
                 .map(p -> LocalTime.parse(p.getValor()))
                 .orElse(LocalTime.of(23, 59));
         }
         
         public void actualizarHoraLimite(String nuevaHora) {
-            Parametros p = repository.findById("hora_limite")
-                    .orElse(Parametros.builder().clave("hora_limite").build()); 
-            
-            p.setValor(nuevaHora);
-            repository.save(p);
+                Parametros p = repository.findById("hora_limite")
+                        .orElse(Parametros.builder().clave("hora_limite").build()); 
+                
+                p.setValor(nuevaHora);
+                repository.save(p);
         }
 }

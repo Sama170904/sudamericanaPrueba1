@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Builder
-@NoArgsConstructor  // <--- ESTA ANOTACIÓN ES LA QUE SOLUCIONA TU ERROR
-@AllArgsConstructor // <--- Necesaria para que @Builder funcione bien
+@NoArgsConstructor  //no me funcioba builder sin esto
+@AllArgsConstructor //No me funcona builder sin esto
 @Data
 public class Parametros {
     @Id
