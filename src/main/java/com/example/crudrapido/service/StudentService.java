@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.example.crudrapido.dto.StudentDTO;
+import com.example.crudrapido.entity.Course;
 import com.example.crudrapido.entity.Student;
 import com.example.crudrapido.repository.StudentRepository;
 
@@ -19,6 +20,9 @@ import lombok.Builder;
 public class StudentService {
     @Autowired
     StudentRepository studentRepository;
+
+    @Autowired
+    private CourseService courseService;
 
     /*
     public List<Student> getStudents() {
@@ -70,4 +74,14 @@ public class StudentService {
         }
         studentRepository.deleteById(id);
     }
+
+    public Student matricularEstudiante(Long studentId, Long courseId) {
+        Student estudiante = studentRepository.findById(studentId)
+                .orElseThrow(() -> new RuntimeException("Estudiante no encontrado con ID: " + studentId));
+
+        Course curso = courseService.getCourseById(courseId);
+        estudiante.getCourses().add(curso);
+        return studentRepository.save(estudiante);
+    }
+
 }

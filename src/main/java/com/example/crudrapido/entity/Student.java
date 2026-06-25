@@ -1,5 +1,8 @@
 package com.example.crudrapido.entity;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
@@ -7,7 +10,9 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Builder
 @Data
@@ -42,5 +47,16 @@ public class Student {
     public enum Estado {
         ACTIVO, INACTIVO, N
     }
+
+
+    @ManyToMany
+    @JoinTable(
+        name = "tbl_student_course", // Nombre de la tabla intermedia que Spring creará
+        joinColumns = @JoinColumn(name = "student_id"), // Columna que apunta a Student
+        inverseJoinColumns = @JoinColumn(name = "course_id") // Columna que apunta a Course
+    )
+    @ToString.Exclude // <--- Bloquea el bucle del toString()
+    @EqualsAndHashCode.Exclude // <--- Bloquea problemas de memoria al comparar
+    private Set<Course> courses = new HashSet<>();
 
 }

@@ -1,5 +1,9 @@
 package com.example.crudrapido.dto;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import com.example.crudrapido.entity.Course;
 import com.example.validation.ValidEmailDominio;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -42,6 +46,9 @@ public class StudentDTO {
     @Email(groups = {OnCreate.class, OnUpdate.class})
     @ValidEmailDominio(groups = {OnCreate.class, OnUpdate.class})
     private String email;
+
+    
+    private Set<Course> courses = new HashSet<>();
 
 
 }

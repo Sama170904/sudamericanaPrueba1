@@ -4,18 +4,20 @@ DOCUMENTACION DEL PROYECTO CRUD RAPIDO
 1. Descripcion general
 ----------------------
 Este proyecto es una aplicacion Spring Boot para gestionar estudiantes y parametros generales.
-Implementa un CRUD basico para estudiantes y un endpoint para actualizar una hora limite almacenada en base de datos.
+Actualmente incluye un CRUD de estudiantes con validaciones, paginacion, manejo global de excepciones y respuestas, un filtro de horario, un endpoint para actualizar una hora limite y un endpoint de prueba que consume una API externa.
 
 2. Tecnologias utilizadas
 -------------------------
 - Java 17
-- Spring Boot
+- Spring Boot 3.x
 - Spring Web MVC
 - Spring Data JPA
 - Spring Validation
+- Hibernate
 - MySQL
 - Lombok
 - OpenAPI / Swagger
+- WebClient
 
 3. Estructura del proyecto
 --------------------------
@@ -27,27 +29,32 @@ src/main/java/com/example/crudrapido/
   - StudentController.java
     Expone los endpoints para crear, listar, actualizar, eliminar y consultar estudiantes.
   - ParametrosController.java
-    Expone un endpoint para actualizar la hora limite.
+    Expone el endpoint para actualizar la hora limite.
+  - PruebaController.java
+    Endpoint de prueba para consumir datos desde una API externa con WebClient.
 
 - service/
   - StudentService.java
-    Contiene la logica de negocio relacionada con estudiantes.
+    Contiene la logica de negocio relacionada con estudiantes, incluyendo paginacion y manejo de estados.
   - ParametroService.java
-    Contiene la logica para obtener y actualizar la hora limite.
+    Contiene la logica para obtener y actualizar la hora limite almacenada en base de datos.
 
 - entity/
   - Student.java
     Entidad que representa a un estudiante en la base de datos.
+    Incluye anotaciones de Hibernate para eliminacion logica y restricciones de consulta.
   - Parametros.java
     Entidad que representa un parametro clave/valor.
 
 - dto/
   - StudentDTO.java
-    Objeto de transferencia para recibir datos de estudiantes con validaciones.
+    Objeto de transferencia para recibir datos de estudiantes con validaciones diferenciadas para crear y actualizar.
   - ParametroDTO.java
-    Objeto para recibir la nueva hora limite.
+    Objeto para recibir la nueva hora limite con validacion de formato HH:mm.
   - ApiResponse.java
     Estructura estandar para respuestas de la API.
+  - PostExternalDTO.java
+    DTO utilizado para mapear la respuesta de la API externa de prueba.
 
 - repository/
   - StudentRepository.java
@@ -63,11 +70,17 @@ src/main/java/com/example/crudrapido/
 
 - filter/
   - HorarioFilter.java
-    Filtro para controlar horarios o reglas adicionales.
+    Filtro para restringir el acceso a los endpoints segun una hora limite configurada.
 
 - config/
   - FilterConfig.java
     Configuracion del filtro de la aplicacion.
+  - WebClientConfig.java
+    Configuracion de WebClient para consumir servicios externos.
+
+- client/
+  - JsonPlaceholderClient.java
+    Cliente para consumir la API externa JSONPlaceholder.
 
 - validation/
   - EmailDominioValidator.java
@@ -78,20 +91,31 @@ src/main/java/com/example/crudrapido/
 4. Funcionalidades principales
 ------------------------------
 Modulo de estudiantes:
-- Listar todos los estudiantes
-- Buscar un estudiante por ID
-- Crear un estudiante
-- Actualizar un estudiante
-- Eliminar un estudiante
+- Listar estudiantes con paginacion.
+- Buscar un estudiante por ID.
+- Crear un estudiante.
+- Actualizar un estudiante.
+- Eliminar un estudiante.
+- Validaciones para nombre, apellido, correo y ID.
+- Transformacion de nombres a mayusculas al crear o actualizar.
+- Eliminacion logica mediante Hibernate en la entidad Student.
 
 Modulo de parametros:
-- Actualizar la hora limite mediante un endpoint POST
+- Actualizar la hora limite mediante un endpoint POST.
+- Lectura de la hora limite desde la base de datos.
+
+Modulo de seguridad y control de acceso:
+- Filtro de horario que bloquea peticiones fuera del rango permitido.
+- Excepciones y respuestas globales estandarizadas.
+
+Modulo de consumo externo:
+- Endpoint de prueba que obtiene posts desde JSONPlaceholder.
 
 5. Endpoints principales
 ------------------------
 Estudiantes:
-- GET /api/v1/students
-  Obtiene todos los estudiantes.
+- GET /api/v1/students?page=0&size=10
+  Obtiene todos los estudiantes con paginacion.
 
 - GET /api/v1/students/{studentId}
   Obtiene un estudiante por su ID.
@@ -109,40 +133,48 @@ Parametros:
 - POST /api/parametros
   Actualiza la hora limite.
 
+Prueba externa:
+- GET /api/prueba/posts
+  Consume la API externa JSONPlaceholder y devuelve los posts.
+
 6. Reglas de validacion
 -----------------------
 - Nombre y apellido: deben tener entre 2 y 15 caracteres.
+- Nombre y apellido: solo admiten letras y acentos.
 - Email: obligatorio, formato valido y dominio permitido.
+- Email: el dominio permitido es sasf.net.
 - ID de estudiante: debe ser mayor a 0 al eliminar o actualizar.
 - Hora limite: debe tener formato HH:mm.
 
 7. Modelo de datos
 ------------------
 Estudiante:
-- studentId: identificador unico
-- firstName: nombre
-- lastName: apellido
-- email: correo electronico
-- estado: estado del registro (ACTIVO, INACTIVO, N)
+- studentId: identificador unico.
+- firstName: nombre.
+- lastName: apellido.
+- email: correo electronico.
+- estado: estado del registro (ACTIVO, INACTIVO, N).
 
 Parametro:
-- clave: identificador del parametro
-- valor: valor asociado
+- clave: identificador del parametro.
+- valor: valor asociado.
 
 8. Notas importantes
 --------------------
-- La aplicacion usa respuestas globales estandarizadas para los exitos y errores.
+- La aplicacion usa respuestas globales estandarizadas para exitos y errores.
 - Los datos se persisten en una base de datos MySQL.
 - El proyecto incluye soporte para documentacion con Swagger/OpenAPI.
+- La aplicacion corre en el puerto 8081 por configuracion.
+- La eliminacion de estudiantes se realiza de forma logica mediante Hibernate.
 
 9. Como ejecutar la aplicacion
 -----------------------------
 1. Configurar la base de datos MySQL en application.properties.
 2. Ejecutar el comando:
-   mvnw spring-boot:run
+   ./mvnw spring-boot:run
 3. Acceder a la documentacion Swagger en:
-   http://localhost:8080/swagger-ui/index.html
+   http://localhost:8081/swagger-ui/index.html
 
 10. Resumen
 -----------
-Este proyecto sirve como base para un CRUD en Spring Boot con validaciones, manejo de excepciones y estructura organizada por capas.
+Este proyecto funciona como una API REST en Spring Boot con CRUD de estudiantes, validaciones personalizadas, manejo centralizado de excepciones, filtro de horario, consumo de servicios externos y estructura organizada por capas.
