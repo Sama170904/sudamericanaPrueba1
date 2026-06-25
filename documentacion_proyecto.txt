@@ -1,0 +1,148 @@
+DOCUMENTACION DEL PROYECTO CRUD RAPIDO
+====================================
+
+1. Descripcion general
+----------------------
+Este proyecto es una aplicacion Spring Boot para gestionar estudiantes y parametros generales.
+Implementa un CRUD basico para estudiantes y un endpoint para actualizar una hora limite almacenada en base de datos.
+
+2. Tecnologias utilizadas
+-------------------------
+- Java 17
+- Spring Boot
+- Spring Web MVC
+- Spring Data JPA
+- Spring Validation
+- MySQL
+- Lombok
+- OpenAPI / Swagger
+
+3. Estructura del proyecto
+--------------------------
+src/main/java/com/example/crudrapido/
+- CrudrapidoApplication.java
+  Clase principal que inicia la aplicacion Spring Boot.
+
+- controller/
+  - StudentController.java
+    Expone los endpoints para crear, listar, actualizar, eliminar y consultar estudiantes.
+  - ParametrosController.java
+    Expone un endpoint para actualizar la hora limite.
+
+- service/
+  - StudentService.java
+    Contiene la logica de negocio relacionada con estudiantes.
+  - ParametroService.java
+    Contiene la logica para obtener y actualizar la hora limite.
+
+- entity/
+  - Student.java
+    Entidad que representa a un estudiante en la base de datos.
+  - Parametros.java
+    Entidad que representa un parametro clave/valor.
+
+- dto/
+  - StudentDTO.java
+    Objeto de transferencia para recibir datos de estudiantes con validaciones.
+  - ParametroDTO.java
+    Objeto para recibir la nueva hora limite.
+  - ApiResponse.java
+    Estructura estandar para respuestas de la API.
+
+- repository/
+  - StudentRepository.java
+    Repositorio para operaciones CRUD sobre estudiantes.
+  - ParametroRepository.java
+    Repositorio para operaciones sobre parametros.
+
+- middlewares/
+  - GlobalExceptionHandler.java
+    Maneja excepciones y devuelve respuestas de error estandarizadas.
+  - GlobalResponseHandler.java
+    Envuelve las respuestas exitosas en un formato uniforme.
+
+- filter/
+  - HorarioFilter.java
+    Filtro para controlar horarios o reglas adicionales.
+
+- config/
+  - FilterConfig.java
+    Configuracion del filtro de la aplicacion.
+
+- validation/
+  - EmailDominioValidator.java
+    Validador personalizado para verificar el dominio del correo.
+  - ValidEmailDominio.java
+    Anotacion personalizada para validar correos.
+
+4. Funcionalidades principales
+------------------------------
+Modulo de estudiantes:
+- Listar todos los estudiantes
+- Buscar un estudiante por ID
+- Crear un estudiante
+- Actualizar un estudiante
+- Eliminar un estudiante
+
+Modulo de parametros:
+- Actualizar la hora limite mediante un endpoint POST
+
+5. Endpoints principales
+------------------------
+Estudiantes:
+- GET /api/v1/students
+  Obtiene todos los estudiantes.
+
+- GET /api/v1/students/{studentId}
+  Obtiene un estudiante por su ID.
+
+- POST /api/v1/students
+  Crea un nuevo estudiante.
+
+- PUT /api/v1/students
+  Actualiza un estudiante existente.
+
+- DELETE /api/v1/students/{studentId}
+  Elimina un estudiante por ID.
+
+Parametros:
+- POST /api/parametros
+  Actualiza la hora limite.
+
+6. Reglas de validacion
+-----------------------
+- Nombre y apellido: deben tener entre 2 y 15 caracteres.
+- Email: obligatorio, formato valido y dominio permitido.
+- ID de estudiante: debe ser mayor a 0 al eliminar o actualizar.
+- Hora limite: debe tener formato HH:mm.
+
+7. Modelo de datos
+------------------
+Estudiante:
+- studentId: identificador unico
+- firstName: nombre
+- lastName: apellido
+- email: correo electronico
+- estado: estado del registro (ACTIVO, INACTIVO, N)
+
+Parametro:
+- clave: identificador del parametro
+- valor: valor asociado
+
+8. Notas importantes
+--------------------
+- La aplicacion usa respuestas globales estandarizadas para los exitos y errores.
+- Los datos se persisten en una base de datos MySQL.
+- El proyecto incluye soporte para documentacion con Swagger/OpenAPI.
+
+9. Como ejecutar la aplicacion
+-----------------------------
+1. Configurar la base de datos MySQL en application.properties.
+2. Ejecutar el comando:
+   mvnw spring-boot:run
+3. Acceder a la documentacion Swagger en:
+   http://localhost:8080/swagger-ui/index.html
+
+10. Resumen
+-----------
+Este proyecto sirve como base para un CRUD en Spring Boot con validaciones, manejo de excepciones y estructura organizada por capas.
