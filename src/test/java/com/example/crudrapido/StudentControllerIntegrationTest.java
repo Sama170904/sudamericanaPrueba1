@@ -43,9 +43,9 @@ public class StudentControllerIntegrationTest {
         // Objeto JSON basado en tus reglas de validación (Nombre/Apellido entre 2 y 15 caracteres)
         String estudianteJson = """
                 {
-                    "firstName": "Estefanooo",
-                    "lastName": "Samaniego",
-                    "email": "estefano@sasf.net"
+                    "firstName": "Eduardo",
+                    "lastName": "Plaza",
+                    "email": "plaza@sasf.net"
                 }
                 """;
 

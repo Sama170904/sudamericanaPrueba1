@@ -65,4 +65,10 @@ public class StudentController {
     @GetMapping("/{studentId}")
     public Student getById(@PathVariable("studentId") Long studentId) {
         return studentService.getStudent(studentId); }
+
+    @PostMapping("/{studentId}/courses/{courseId}")
+    public Student matricular(@PathVariable("studentId") Long studentId, 
+                              @PathVariable("courseId") Long courseId) {
+        return studentService.matricularEstudiante(studentId, courseId);
+    }
 }

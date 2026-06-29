@@ -22,10 +22,8 @@ public class WebClientConfig {
     @Bean
     public JsonPlaceholderClient jsonPlaceholderClient(WebClient jsonPlaceholderWebClient) {
         
-        // CORRECCIÓN 1: Usar 'create' en lugar de 'forClient' para compatibilidad con Spring Boot 3.2+
         WebClientAdapter adapter = WebClientAdapter.create(jsonPlaceholderWebClient);
         
-        // CORRECCIÓN 2: Usar 'builderFor' pasando el adapter corregido
         HttpServiceProxyFactory httpServiceProxyFactory =
                 HttpServiceProxyFactory.builderFor(adapter).build();
         
