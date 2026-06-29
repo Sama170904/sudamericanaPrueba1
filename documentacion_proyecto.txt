@@ -3,8 +3,8 @@ DOCUMENTACION DEL PROYECTO CRUD RAPIDO
 
 1. Descripcion general
 ----------------------
-Este proyecto es una aplicacion Spring Boot para gestionar estudiantes y parametros generales.
-Actualmente incluye un CRUD de estudiantes con validaciones, paginacion, manejo global de excepciones y respuestas, un filtro de horario, un endpoint para actualizar una hora limite y un endpoint de prueba que consume una API externa.
+Este proyecto es una aplicacion Spring Boot que gestiona estudiantes, parametros de horario y consume una API externa.
+Incluye un CRUD de estudiantes con validaciones por grupos, paginacion, eliminacion logica, un filtro de horario, manejo global de respuestas y excepciones, un cliente WebClient moderno y un scheduler.
 
 2. Tecnologias utilizadas
 -------------------------
@@ -17,76 +17,91 @@ Actualmente incluye un CRUD de estudiantes con validaciones, paginacion, manejo 
 - MySQL
 - Lombok
 - OpenAPI / Swagger
-- WebClient
+- WebClient / HttpServiceProxy
+- Scheduling (@Scheduled)
 
 3. Estructura del proyecto
 --------------------------
 src/main/java/com/example/crudrapido/
 - CrudrapidoApplication.java
   Clase principal que inicia la aplicacion Spring Boot.
+  Configura la propiedad java.net.preferIPv4Stack=true para evitar problemas de resolución DNS/IPv6 con WebClient.
 
 - controller/
   - StudentController.java
-    Expone los endpoints para crear, listar, actualizar, eliminar y consultar estudiantes.
+    Expone los endpoints para listar, crear, actualizar, eliminar, obtener por ID y matricular estudiantes.
   - ParametrosController.java
-    Expone el endpoint para actualizar la hora limite.
+    Expone el endpoint para actualizar la hora limite de acceso.
   - PruebaController.java
-    Endpoint de prueba para consumir datos desde una API externa con WebClient.
+    Expone un endpoint para consumir posts desde la API externa JSONPlaceholder.
 
 - service/
   - StudentService.java
-    Contiene la logica de negocio relacionada con estudiantes, incluyendo paginacion y manejo de estados.
+    Logica de negocio para estudiantes, paginacion, creación, actualización, eliminacion y matricula en cursos.
   - ParametroService.java
-    Contiene la logica para obtener y actualizar la hora limite almacenada en base de datos.
+    Logica para obtener y actualizar la hora limite almacenada en la tabla de parametros.
+  - CourseService.java
+    Logica para obtener cursos y soportar la matricula de estudiantes.
 
 - entity/
   - Student.java
-    Entidad que representa a un estudiante en la base de datos.
-    Incluye anotaciones de Hibernate para eliminacion logica y restricciones de consulta.
+    Entidad que representa a un estudiante.
+    Implementa eliminacion logica con @SQLDelete y aplica restriccion de consulta customizada.
+    Mantiene relacion many-to-many con Course.
+  - Course.java
+    Entidad que representa un curso.
+    Mantiene relacion many-to-many con Student.
   - Parametros.java
     Entidad que representa un parametro clave/valor.
 
 - dto/
   - StudentDTO.java
-    Objeto de transferencia para recibir datos de estudiantes con validaciones diferenciadas para crear y actualizar.
+    Objeto de transferencia para student con validaciones de creacion y actualizacion.
+    Usa grupos @OnCreate y @OnUpdate para aplicar reglas distintas.
   - ParametroDTO.java
-    Objeto para recibir la nueva hora limite con validacion de formato HH:mm.
+    DTO para recibir la nueva hora limite con formato HH:mm.
   - ApiResponse.java
-    Estructura estandar para respuestas de la API.
+    Estructura uniforme para envolver respuestas exitosas.
   - PostExternalDTO.java
-    DTO utilizado para mapear la respuesta de la API externa de prueba.
+    DTO para mapear la respuesta de la API externa JSONPlaceholder.
 
 - repository/
   - StudentRepository.java
-    Repositorio para operaciones CRUD sobre estudiantes.
+    Repositorio JPA para Student.
+  - CourseRepository.java
+    Repositorio JPA para Course.
   - ParametroRepository.java
-    Repositorio para operaciones sobre parametros.
+    Repositorio JPA para Parametros.
 
 - middlewares/
   - GlobalExceptionHandler.java
-    Maneja excepciones y devuelve respuestas de error estandarizadas.
+    Maneja excepciones de validacion y RuntimeException.
   - GlobalResponseHandler.java
-    Envuelve las respuestas exitosas en un formato uniforme.
+    Envuelve en ApiResponse las respuestas exitosas, excepto ApiResponse, ResponseEntity, String y byte[].
 
 - filter/
   - HorarioFilter.java
-    Filtro para restringir el acceso a los endpoints segun una hora limite configurada.
+    Bloquea accesos a /api/* fuera de la hora limite configurada, excepto al endpoint /api/parametros.
 
 - config/
   - FilterConfig.java
-    Configuracion del filtro de la aplicacion.
+    Registra el filtro de horario sobre /api/* con orden 1.
   - WebClientConfig.java
-    Configuracion de WebClient para consumir servicios externos.
+    Configura WebClient y crea el cliente HttpServiceProxy para JSONPlaceholder.
 
 - client/
   - JsonPlaceholderClient.java
-    Cliente para consumir la API externa JSONPlaceholder.
+    Interfaz declarativa que consume la API externa JSONPlaceholder.
+
+- scheduler/
+  - StudentScheduler.java
+    Componente con @Scheduled que imprime un mensaje cada 10 minutos.
 
 - validation/
   - EmailDominioValidator.java
-    Validador personalizado para verificar el dominio del correo.
+    Valida que el correo pertenezca al dominio sasf.net.
   - ValidEmailDominio.java
-    Anotacion personalizada para validar correos.
+    Anotacion personalizada para validar correos con dominio.
 
 4. Funcionalidades principales
 ------------------------------
@@ -95,43 +110,50 @@ Modulo de estudiantes:
 - Buscar un estudiante por ID.
 - Crear un estudiante.
 - Actualizar un estudiante.
-- Eliminar un estudiante.
+- Eliminar un estudiante (logico) por ID.
+- Matricular un estudiante en un curso.
 - Validaciones para nombre, apellido, correo y ID.
-- Transformacion de nombres a mayusculas al crear o actualizar.
-- Eliminacion logica mediante Hibernate en la entidad Student.
+- Transformacion de nombres y apellidos a mayusculas en creacion/actualizacion.
+- Eliminacion logica mediante @SQLDelete en la entidad Student.
+
+Modulo de cursos:
+- Entidad Course con relacion many-to-many con Student.
+- Matricula de estudiante en curso mediante POST /api/v1/students/{studentId}/courses/{courseId}.
 
 Modulo de parametros:
-- Actualizar la hora limite mediante un endpoint POST.
+- Actualizar la hora limite mediante POST /api/parametros.
 - Lectura de la hora limite desde la base de datos.
+- El horario limite controla el acceso a la mayoria de endpoints.
 
 Modulo de seguridad y control de acceso:
 - Filtro de horario que bloquea peticiones fuera del rango permitido.
 - Excepciones y respuestas globales estandarizadas.
 
 Modulo de consumo externo:
-- Endpoint de prueba que obtiene posts desde JSONPlaceholder.
+- Endpoint de prueba que obtiene posts desde JSONPlaceholder usando WebClient.
+
+Modulo de programacion de tareas:
+- Scheduler que ejecuta una tarea cada 600000 ms (10 minutos).
 
 5. Endpoints principales
 ------------------------
 Estudiantes:
 - GET /api/v1/students?page=0&size=10
-  Obtiene todos los estudiantes con paginacion.
-
+  Obtiene la lista de estudiantes paginada.
 - GET /api/v1/students/{studentId}
   Obtiene un estudiante por su ID.
-
 - POST /api/v1/students
   Crea un nuevo estudiante.
-
 - PUT /api/v1/students
   Actualiza un estudiante existente.
-
 - DELETE /api/v1/students/{studentId}
-  Elimina un estudiante por ID.
+  Elimina un estudiante por ID (logico).
+- POST /api/v1/students/{studentId}/courses/{courseId}
+  Matricula un estudiante en un curso.
 
 Parametros:
 - POST /api/parametros
-  Actualiza la hora limite.
+  Actualiza la hora limite de acceso.
 
 Prueba externa:
 - GET /api/prueba/posts
@@ -139,33 +161,40 @@ Prueba externa:
 
 6. Reglas de validacion
 -----------------------
-- Nombre y apellido: deben tener entre 2 y 15 caracteres.
-- Nombre y apellido: solo admiten letras y acentos.
-- Email: obligatorio, formato valido y dominio permitido.
-- Email: el dominio permitido es sasf.net.
-- ID de estudiante: debe ser mayor a 0 al eliminar o actualizar.
-- Hora limite: debe tener formato HH:mm.
+- studentId: debe ser mayor a 0 para actualizacion y eliminacion.
+- firstName: entre 2 y 15 caracteres, solo letras y acentos en creacion.
+- lastName: entre 2 y 15 caracteres, solo letras y acentos en creacion.
+- email: obligatorio en creacion, formato valido y dominio sasf.net.
+- nuevaHora: debe tener formato HH:mm.
 
 7. Modelo de datos
 ------------------
-Estudiante:
+Estudiante (Student):
 - studentId: identificador unico.
 - firstName: nombre.
 - lastName: apellido.
-- email: correo electronico.
+- email: correo electronico unico.
 - estado: estado del registro (ACTIVO, INACTIVO, N).
+- courses: cursos asociados mediante relacion many-to-many.
 
-Parametro:
+Curso (Course):
+- courseId: identificador unico.
+- name: nombre del curso.
+- description: descripcion del curso.
+- students: estudiantes asociados.
+
+Parametro (Parametros):
 - clave: identificador del parametro.
 - valor: valor asociado.
 
 8. Notas importantes
 --------------------
-- La aplicacion usa respuestas globales estandarizadas para exitos y errores.
-- Los datos se persisten en una base de datos MySQL.
-- El proyecto incluye soporte para documentacion con Swagger/OpenAPI.
-- La aplicacion corre en el puerto 8081 por configuracion.
-- La eliminacion de estudiantes se realiza de forma logica mediante Hibernate.
+- GlobalResponseHandler normaliza respuestas exitosas en ApiResponse.
+- GlobalExceptionHandler devuelve BAD_REQUEST para errores de validacion y NOT_FOUND para RuntimeException.
+- HorarioFilter bloquea peticiones fuera del horario limite excepto el endpoint de parametros.
+- La aplicacion usa MySQL y el esquema se actualiza automaticamente con spring.jpa.hibernate.ddl-auto=update.
+- El puerto configurado es 8081.
+- La propiedad java.net.preferIPv4Stack=true evita problemas de resolución DNS/IPv6 con WebClient.
 
 9. Como ejecutar la aplicacion
 -----------------------------
@@ -177,4 +206,4 @@ Parametro:
 
 10. Resumen
 -----------
-Este proyecto funciona como una API REST en Spring Boot con CRUD de estudiantes, validaciones personalizadas, manejo centralizado de excepciones, filtro de horario, consumo de servicios externos y estructura organizada por capas.
+Este proyecto es una API REST Spring Boot con gestion de estudiantes y cursos, validaciones personalizadas, eliminacion logica, filtro horario, manejo global de errores y respuestas, consumo de API externa via WebClient, y una tarea programada de ejemplo.
