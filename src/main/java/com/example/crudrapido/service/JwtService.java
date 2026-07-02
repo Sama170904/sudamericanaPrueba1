@@ -33,7 +33,7 @@ public class JwtService {
         return extractClaim(token, Claims::getSubject);
     }
 
-    //extrae el clain de la codificacion del jwt
+    //extrae el claim(datos sobre el usuario) de la codificacion del jwt
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
@@ -56,12 +56,12 @@ public class JwtService {
     //FABRICACION DEL TOKEN
     private String buildToken(Map<String, Object> extraClaims, UserDetails userDetails, long expiration) {
         return Jwts.builder()
-                .claims(extraClaims)
-                .subject(userDetails.getUsername())
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(getSignInKey()) //le agrega la firma
-                .compact(); //comprime el json para que sea una cadena de texto
+                .setClaims(extraClaims)
+                .setSubject(userDetails.getUsername())
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))
+                .signWith(getSignInKey()) 
+                .compact();
     }
 
 
@@ -82,11 +82,11 @@ public class JwtService {
 
     //ENCRIPTACION Y CRIPTOGRAFIA
     private Claims extractAllClaims(String token) {
-        return Jwts.parser()
-                .verifyWith(getSignInKey())
+        return Jwts.parserBuilder() 
+                .setSigningKey(getSignInKey()) 
                 .build()
-                .parseSignedClaims(token)
-                .getPayload();
+                .parseClaimsJws(token)  
+                .getBody(); 
     }
 
     private SecretKey getSignInKey() {

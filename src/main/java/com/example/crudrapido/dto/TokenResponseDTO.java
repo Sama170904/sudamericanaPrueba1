@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class TokenResponse {
+public class TokenResponseDTO {
 
     @JsonProperty("access_token") //asi se ve la clave en el json y no sera con el nombre del atributo
     private String accessToken;

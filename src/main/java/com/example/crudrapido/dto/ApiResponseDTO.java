@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Data
 @Builder
-public class ApiResponse<T> {
+public class ApiResponseDTO<T> {
     
     private LocalDateTime timestamp; 
     private int status;             

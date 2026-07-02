@@ -1,6 +1,6 @@
 package com.example.crudrapido.middlewares;
 
-import com.example.crudrapido.dto.ApiResponse;
+import com.example.crudrapido.dto.ApiResponseDTO;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +19,7 @@ public class GlobalResponseHandler implements ResponseBodyAdvice<Object> {
 
     @Override
     public boolean supports(MethodParameter returnType, Class converterType) {
-        return !returnType.getParameterType().equals(ApiResponse.class) && 
+        return !returnType.getParameterType().equals(ApiResponseDTO.class) && 
         !returnType.getParameterType().equals(ResponseEntity.class)&&
             !returnType.getParameterType().equals(String.class) &&
             !returnType.getParameterType().equals(byte[].class);
@@ -40,7 +40,7 @@ public class GlobalResponseHandler implements ResponseBodyAdvice<Object> {
                                     MediaType selectedContentType, Class selectedConverterType, 
                                     ServerHttpRequest request, ServerHttpResponse response) {
 
-        return ApiResponse.builder()
+        return ApiResponseDTO.builder()
                 .timestamp(LocalDateTime.now())
                 .status(200)
                 .message("Operación exitosa")

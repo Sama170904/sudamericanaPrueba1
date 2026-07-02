@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class LoginRequest {
+public class LoginRequestDTO {
 
     @NotBlank(message = "El email es obligatorio")
     @Email(message = "Debe ser un formato de correo válido")

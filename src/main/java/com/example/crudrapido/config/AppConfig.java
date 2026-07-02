@@ -42,9 +42,9 @@ public class AppConfig {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService());
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
-    }
+    }// este AuthenticationProvider se usa en SecurityConfig, este es nuestro DETECTIVE
 
-    //Es el que recibe la informacion del controllador que es donde estan los endpoints
+    //Es el que recibe la informacion del service que es el acceso derivado a los endpoints
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
