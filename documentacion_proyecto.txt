@@ -207,3 +207,57 @@ Parametro (Parametros):
 10. Resumen
 -----------
 Este proyecto es una API REST Spring Boot con gestion de estudiantes y cursos, validaciones personalizadas, eliminacion logica, filtro horario, manejo global de errores y respuestas, consumo de API externa via WebClient, y una tarea programada de ejemplo.
+
+11. Seguridad y autenticación (JWT)
+---------------------------------
+Se añadió un módulo de autenticación basado en JWT para administradores. Puntos clave:
+
+- Endpoints:
+  - POST /api/v1/auth/login : recibe `LoginRequestDTO` (email, password) y devuelve `TokenResponseDTO` con `access_token` y `refresh_token`.
+
+- DTOs y entidades:
+  - `LoginRequestDTO` : contiene `email` y `password` (validaciones aplicadas).
+  - `TokenResponseDTO` : devuelve `access_token` y `refresh_token` en el JSON.
+  - `Token` (entidad): tabla `tbl_tokens` que guarda tokens de acceso emitidos, su estado (`revoked`, `expired`) y referencia a `Administrador`.
+
+- Servicios y componentes:
+  - `AuthService` : autentica con `AuthenticationManager`, genera access y refresh tokens con `JwtService`, revoca tokens previos y guarda el nuevo token en la BD.
+  - `JwtService` : encapsula la generación y validación de JWT (generar token, extraer username, validar expiración). Requiere propiedades `jwt.secret`, `jwt.expiration` y `jwt.refresh.expiration` en `application.properties`.
+  - `JwtAuthenticationFilter` : filtro `OncePerRequestFilter` que extrae el header `Authorization: Bearer ...`, valida el token con `JwtService` y con `TokenRepository` (revocado/expirado) y establece la autenticación en `SecurityContext`.
+
+- Repositorio:
+  - `TokenRepository` : consulta tokens válidos por usuario y permite buscar por token.
+
+- Configuración de seguridad:
+  - `SecurityConfig` : permite `/api/v1/auth/**` y rutas de Swagger públicamente; el resto requiere autenticación. Usa `JwtAuthenticationFilter` antes del `UsernamePasswordAuthenticationFilter` y mantiene la aplicación sin estado (`STATELESS`).
+  - `AppConfig` : define `UserDetailsService` que busca `Administrador` por email, `AuthenticationProvider` con `DaoAuthenticationProvider` y el `PasswordEncoder` (`BCryptPasswordEncoder`).
+
+- Recomendaciones y notas operativas:
+  - `jwt.secret` debe ser una cadena Base64 con suficiente entropía (p. ej. mínimo 256 bits para HS256). Puedes generar una clave segura con `openssl rand -base64 32` o una herramienta equivalente.
+  - Verificar que `jwt.expiration` y `jwt.refresh.expiration` estén expresados en ms o como está documentado en `application.properties`.
+  - Manejar excepciones comunes de JWT (ExpiredJwtException, JwtException) si se desea respuestas más amigables.
+  - El filtro `JwtAuthenticationFilter` omite rutas que contienen `/api/v1/auth` para permitir el inicio de sesión.
+
+12. Archivos añadidos / revisar para documentar
+---------------------------------------------
+Los siguientes ficheros contienen lógica de seguridad o JWT que conviene verificar y/o añadir comentarios/documentación inline si es necesario:
+
+- src/main/java/com/example/crudrapido/controller/AuthController.java
+- src/main/java/com/example/crudrapido/dto/LoginRequestDTO.java
+- src/main/java/com/example/crudrapido/dto/TokenResponseDTO.java
+- src/main/java/com/example/crudrapido/entity/Token.java
+- src/main/java/com/example/crudrapido/filter/JwtAuthenticationFilter.java
+- src/main/java/com/example/crudrapido/repository/TokenRepository.java
+- src/main/java/com/example/crudrapido/service/AuthService.java
+- src/main/java/com/example/crudrapido/service/JwtService.java
+- src/main/java/com/example/crudrapido/config/SecurityConfig.java
+- src/main/java/com/example/crudrapido/config/AppConfig.java
+
+13. Próximos pasos sugeridos
+---------------------------
+- Revisar `application.properties` y documentar las claves JWT actuales (`jwt.secret`, `jwt.expiration`, `jwt.refresh.expiration`).
+- Añadir manejo de errores para tokens expirados o inválidos y documentar el comportamiento en la API.
+- Documentar en Swagger (si se desea) los endpoints de autenticación y/o indicar cómo usar `Authorize` en Swagger UI.
+- (Opcional) Añadir endpoint para `logout` que marque el token actual como revocado.
+
+Fin de la actualización de documentación.
